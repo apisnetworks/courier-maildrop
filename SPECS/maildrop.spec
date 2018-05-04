@@ -6,11 +6,11 @@
 
 Summary: Maildrop mail filter/mail delivery agent
 Name: maildrop
-Version: 2.8.5
+Version: 2.9.3
 Release: 1%{?dist}%{!?dist:%{courier_release}}
 License: GPLv3
 Group: Applications/Internet
-Source: maildrop-2.8.5.tar.bz2
+Source: maildrop-%{version}.tar.bz2
 Url: http://www.courier-mta.org/maildrop/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 BuildRequires: /usr/include/fam.h gdbm-devel pcre-devel
