@@ -1,6 +1,6 @@
-diff -Nur maildrop-2.8.5/libs/maildrop/lexer.h courier-maildrop/libs/maildrop/lexer.h
---- maildrop-2.8.5/libs/maildrop/lexer.h	2013-08-25 14:54:20.000000000 -0400
-+++ courier-maildrop/libs/maildrop/lexer.h	2017-10-31 14:45:36.752648929 -0400
+diff -Nur maildrop-2.9.3/libs/maildrop/lexer.h maildrop-2.9.3-new/libs/maildrop/lexer.h
+--- maildrop-2.9.3/libs/maildrop/lexer.h	2013-08-25 14:54:20.000000000 -0400
++++ maildrop-2.9.3-new/libs/maildrop/lexer.h	2018-05-29 16:12:28.823045565 -0400
 @@ -37,9 +37,11 @@
  
  	// nextchar() is used to actually read the next character.
@@ -15,10 +15,34 @@ diff -Nur maildrop-2.8.5/libs/maildrop/lexer.h courier-maildrop/libs/maildrop/le
  				return (c);
  			}
  	void	error(const char *);
-diff -Nur maildrop-2.8.5/libs/maildrop/main.C courier-maildrop/libs/maildrop/main.C
---- maildrop-2.8.5/libs/maildrop/main.C	2016-04-01 04:00:19.000000000 -0400
-+++ courier-maildrop/libs/maildrop/main.C	2017-10-31 14:45:36.754648918 -0400
-@@ -387,12 +387,12 @@
+diff -Nur maildrop-2.9.3/libs/maildrop/main.C maildrop-2.9.3-new/libs/maildrop/main.C
+--- maildrop-2.9.3/libs/maildrop/main.C	2017-08-19 09:30:56.000000000 -0400
++++ maildrop-2.9.3-new/libs/maildrop/main.C	2018-05-29 16:14:55.263282625 -0400
+@@ -303,9 +303,10 @@
+ 	}
+ 
+ 	uid_t u;
+-	if (auth->sysusername)
++	if (auth->sysusername || auth->address)
+ 	{
+-		struct	passwd *q=getpwnam(auth->sysusername);
++		struct	passwd *q = auth->sysusername ?
++			getpwnam(auth->sysusername) : getpwnam(auth->address);
+ 
+ 		if (q == NULL)
+ 		{
+@@ -318,8 +319,9 @@
+ 
+ 		u=q->pw_uid;
+ 	}
+-	else
++	else {
+ 		u=*auth->sysuserid;
++	}
+ 
+ 	if (VerboseLevel() > 1)
+ 	{
+@@ -387,12 +389,12 @@
  			    void *void_arg)
  {
  	Maildrop &maildrop=*(Maildrop *)void_arg;
@@ -34,7 +58,7 @@ diff -Nur maildrop-2.8.5/libs/maildrop/main.C courier-maildrop/libs/maildrop/mai
  		b.push(0);
  
  		merr << "maildrop: dovecotauth: groupid="
-@@ -402,24 +402,31 @@
+@@ -402,24 +404,31 @@
  	setgroupid(auth->sysgroupid);
  
  	uid_t u;
@@ -71,7 +95,7 @@ diff -Nur maildrop-2.8.5/libs/maildrop/main.C courier-maildrop/libs/maildrop/mai
  	if (VerboseLevel() > 1)
  	{
  		Buffer b;
-@@ -885,7 +892,7 @@
+@@ -885,7 +894,7 @@
  			{
  				if ( !S_ISDIR(buf.st_mode))
  					tempfail("$HOME/.mailfilters should be a directory.");
@@ -80,7 +104,7 @@ diff -Nur maildrop-2.8.5/libs/maildrop/main.C courier-maildrop/libs/maildrop/mai
  					tempfail("Invalid permissions on $HOME/.mailfilters - remove world and group perms.");
  				if ( buf.st_uid != getuid())
  					tempfail("Invalid user ownership of $HOME/.mailfilters.");
-@@ -1080,7 +1087,7 @@
+@@ -1080,7 +1089,7 @@
  
  		if (!S_ISREG(stat_buf.st_mode))
  			tempfail("mailfilter file isn't a regular file.");
@@ -89,4 +113,3 @@ diff -Nur maildrop-2.8.5/libs/maildrop/main.C courier-maildrop/libs/maildrop/mai
  			tempfail("Cannot have world/group permissions on the filter file - for your own good.");
  		if (stat_buf.st_uid != getuid())
  			tempfail("mailfilter file is owned by the wrong user.");
-

@@ -84,7 +84,7 @@ rm -rf $RPM_BUILD_ROOT%{_docdir}/*/html
 
 %doc htmldoc/*
 
-%attr(555, root, mail) %{_bindir}/maildrop
+%attr(4510, root, mail) %{_bindir}/maildrop
 %attr(555, root, mail) %{_bindir}/lockmail
 %{_bindir}/mailbot
 %{_bindir}/maildirmake
