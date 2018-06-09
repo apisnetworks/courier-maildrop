@@ -1,6 +1,6 @@
-diff -Nur maildrop-2.9.3/libs/maildrop/lexer.h maildrop-2.9.3-new/libs/maildrop/lexer.h
---- maildrop-2.9.3/libs/maildrop/lexer.h	2013-08-25 14:54:20.000000000 -0400
-+++ maildrop-2.9.3-new/libs/maildrop/lexer.h	2018-05-29 16:12:28.823045565 -0400
+diff -Nur maildrop-2.9.3-orig/libs/maildrop/lexer.h maildrop-2.9.3/libs/maildrop/lexer.h
+--- maildrop-2.9.3-orig/libs/maildrop/lexer.h	2013-08-25 14:54:20.000000000 -0400
++++ maildrop-2.9.3/libs/maildrop/lexer.h	2018-06-09 17:48:53.788180761 -0400
 @@ -37,9 +37,11 @@
  
  	// nextchar() is used to actually read the next character.
@@ -15,10 +15,10 @@ diff -Nur maildrop-2.9.3/libs/maildrop/lexer.h maildrop-2.9.3-new/libs/maildrop/
  				return (c);
  			}
  	void	error(const char *);
-diff -Nur maildrop-2.9.3/libs/maildrop/main.C maildrop-2.9.3-new/libs/maildrop/main.C
---- maildrop-2.9.3/libs/maildrop/main.C	2017-08-19 09:30:56.000000000 -0400
-+++ maildrop-2.9.3-new/libs/maildrop/main.C	2018-05-29 16:14:55.263282625 -0400
-@@ -303,9 +303,10 @@
+diff -Nur maildrop-2.9.3-orig/libs/maildrop/main.C maildrop-2.9.3/libs/maildrop/main.C
+--- maildrop-2.9.3-orig/libs/maildrop/main.C	2017-08-19 09:30:56.000000000 -0400
++++ maildrop-2.9.3/libs/maildrop/main.C	2018-06-09 18:07:09.426404364 -0400
+@@ -303,9 +303,13 @@
  	}
  
  	uid_t u;
@@ -26,23 +26,29 @@ diff -Nur maildrop-2.9.3/libs/maildrop/main.C maildrop-2.9.3-new/libs/maildrop/m
 +	if (auth->sysusername || auth->address)
  	{
 -		struct	passwd *q=getpwnam(auth->sysusername);
++		Buffer val, name;
 +		struct	passwd *q = auth->sysusername ?
 +			getpwnam(auth->sysusername) : getpwnam(auth->address);
++		name.set("RECIPIENT");
++		val.set(auth->sysusername ? auth->sysusername : auth->address);
  
  		if (q == NULL)
  		{
-@@ -318,8 +319,9 @@
+@@ -317,9 +321,12 @@
+ 		}
  
  		u=q->pw_uid;
++		SetVar(name, val);
  	}
 -	else
 +	else {
  		u=*auth->sysuserid;
 +	}
++
  
  	if (VerboseLevel() > 1)
  	{
-@@ -387,12 +389,12 @@
+@@ -387,12 +394,12 @@
  			    void *void_arg)
  {
  	Maildrop &maildrop=*(Maildrop *)void_arg;
@@ -58,18 +64,19 @@ diff -Nur maildrop-2.9.3/libs/maildrop/main.C maildrop-2.9.3-new/libs/maildrop/m
  		b.push(0);
  
  		merr << "maildrop: dovecotauth: groupid="
-@@ -402,24 +404,31 @@
+@@ -402,24 +409,29 @@
  	setgroupid(auth->sysgroupid);
  
  	uid_t u;
 -	if (auth->sysusername)
-+	Buffer name,val;
-+	name="RECIPIENT";
 +	if (auth->address)
  	{
 -		struct	passwd *q=getpwnam(auth->sysusername);
+-
++		Buffer val, name;
 +		struct	passwd *q=getpwnam(auth->address);
- 
++		name.set("RECIPIENT");
++		val.set(auth->address);
  		if (q == NULL)
  		{
  			merr << "Cannot find system user "
@@ -81,21 +88,19 @@ diff -Nur maildrop-2.9.3/libs/maildrop/main.C maildrop-2.9.3-new/libs/maildrop/m
  		}
  
  		u=q->pw_uid;
-+		val=auth->address;
++		SetVar(name, val);
  	}
 -	else
 +	else 
 +	{
  		u=*auth->sysuserid;
 -
-+		val="nobody";
 +	}
-+	SetVar(name, val);
 +	
  	if (VerboseLevel() > 1)
  	{
  		Buffer b;
-@@ -885,7 +894,7 @@
+@@ -885,7 +897,7 @@
  			{
  				if ( !S_ISDIR(buf.st_mode))
  					tempfail("$HOME/.mailfilters should be a directory.");
@@ -104,7 +109,7 @@ diff -Nur maildrop-2.9.3/libs/maildrop/main.C maildrop-2.9.3-new/libs/maildrop/m
  					tempfail("Invalid permissions on $HOME/.mailfilters - remove world and group perms.");
  				if ( buf.st_uid != getuid())
  					tempfail("Invalid user ownership of $HOME/.mailfilters.");
-@@ -1080,7 +1089,7 @@
+@@ -1080,7 +1092,7 @@
  
  		if (!S_ISREG(stat_buf.st_mode))
  			tempfail("mailfilter file isn't a regular file.");
