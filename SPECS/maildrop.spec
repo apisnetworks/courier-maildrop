@@ -7,7 +7,7 @@
 Summary: Maildrop mail filter/mail delivery agent
 Name: maildrop
 Version: 3.0.0
-Release: 1%{?dist}%{!?dist:%{courier_release}}
+Release: 2%{?dist}%{!?dist:%{courier_release}}
 License: GPLv3
 Group: Applications/Internet
 Source: maildrop-%{version}.tar.bz2
@@ -17,6 +17,7 @@ Requires: courier-unicode >= 2.1
 BuildRequires: /usr/include/fam.h gdbm-devel pcre-devel
 BuildRequires: libidn-devel
 BuildRequires: courier-unicode-devel >= 2.1
+BuildRequires: courier-authlib-devel
 Patch0: apnscp-maildrop.patch
 
 %package devel
