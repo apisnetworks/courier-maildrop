@@ -6,7 +6,7 @@
 
 Summary: Maildrop mail filter/mail delivery agent
 Name: maildrop
-Version: 3.0.1
+Version: 3.0.8
 Release: 1%{?dist}%{!?dist:%{courier_release}}
 License: GPLv3
 Group: Applications/Internet
@@ -14,11 +14,12 @@ Source: maildrop-%{version}.tar.bz2
 Url: http://www.courier-mta.org/maildrop/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Requires: courier-unicode >= 2.1
-BuildRequires: /usr/include/fam.h gdbm-devel pcre-devel
+BuildRequires: /usr/include/fam.h gdbm-devel pcre2-devel
 BuildRequires: libidn-devel
 BuildRequires: courier-unicode-devel >= 2.1
 BuildRequires: courier-authlib-devel
 Patch0: apnscp-maildrop.patch
+Patch1: maildrop-bypass-authlib.patch
 
 %package devel
 Summary: development tools for handling E-mail messages
@@ -65,6 +66,7 @@ utilities.
 %prep
 %setup -q
 %patch0 -p1 -b .apnscp
+%patch1 -p1
 
 %configure --with-devel --enable-userdb --enable-maildirquota --enable-syslog=1 --enable-trusted-users='root mail daemon postmaster qmaild mmdf' --enable-restrict-trusted=0 --enable-sendmail=/usr/sbin/sendmail
 
@@ -90,6 +92,8 @@ rm -rf $RPM_BUILD_ROOT%{_docdir}/*/html
 %attr(555, root, mail) %{_bindir}/lockmail
 %{_bindir}/mailbot
 %{_bindir}/maildirmake
+%{_bindir}/maildirwatch
+%{_bindir}/maildirkw
 %{_bindir}/deliverquota
 %{_bindir}/reformail
 %{_bindir}/makemime

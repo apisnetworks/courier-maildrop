@@ -1,0 +1,22 @@
+--- maildrop-3.0.8-orig/libs/maildrop/main.C	2022-09-16 16:48:57.196063148 -0700
++++ maildrop-3.0.8/libs/maildrop/main.C	2022-09-16 18:18:39.648979576 -0700
+@@ -543,6 +543,10 @@
+ 			if (!*optarg && argn < argc)	optarg=argv[argn++];
+ 			deliverymode=optarg;
+ 			break;
++		case 'x':
++			// deactivate authlib usage at runtime
++			maildrop.authlib_essential = -1;
++			break;
+ 		case 'V':
+ 			if (!*optarg && argn < argc)	optarg=argv[argn++];
+ 			maildrop.verbose_level=atoi(optarg);
+@@ -643,7 +647,7 @@
+ 			}
+ 			else
+ #endif
+-			{
++			if (maildrop.authlib_essential != -1) {
+ 				found = find_in_authlib(&maildrop, deliverymode);
+ 			}
+ 
