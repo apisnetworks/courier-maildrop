@@ -1,0 +1,35 @@
+Binary files maildrop-3.0.8-orig/libs/maildrop/maildrop and maildrop-3.0.8/libs/maildrop/maildrop differ
+diff -Nur maildrop-3.0.8-orig/libs/maildrop/main.C maildrop-3.0.8/libs/maildrop/main.C
+--- maildrop-3.0.8-orig/libs/maildrop/main.C	2022-09-23 14:14:11.822372325 -0700
++++ maildrop-3.0.8/libs/maildrop/main.C	2022-09-23 21:52:14.792103338 -0700
+@@ -71,6 +71,7 @@
+ static const char *defaults_vals[]={LOCKEXT_DEF,LOCKSLEEP_DEF,LOCKTIMEOUT_DEF,
+ 					LOCKREFRESH_DEF, DEFAULT_PATH,
+ 					SENDMAIL_DEF, ""};
++static const char *argv_vars[] = {"EXTENSION", "RECIPIENT", "USER", "NEXTHOP", "SENDER"};
+ 
+ Maildrop maildrop;
+ 
+@@ -794,7 +795,7 @@
+ 		}
+ 	}
+ 
+-int	i;
++int	i, knownArgvSize = (unsigned int)(sizeof(argv_vars)/sizeof(argv_vars[0]));
+ Buffer	name;
+ Buffer	value;
+ 
+@@ -826,6 +827,12 @@
+ 		name.append( (unsigned long)i);
+ 		value=argv[argn++];
+ 		SetVar(name, value);
++		if ((i - 1) < knownArgvSize) {
++			name = "";
++			name.append(argv_vars[i-1]);
++			SetVar(name, value);
++		}
++
+ 		++i;
+ 	}
+ 
+Binary files maildrop-3.0.8-orig/libs/maildrop/main.o and maildrop-3.0.8/libs/maildrop/main.o differ

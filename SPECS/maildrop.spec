@@ -7,7 +7,7 @@
 Summary: Maildrop mail filter/mail delivery agent
 Name: maildrop
 Version: 3.0.8
-Release: 1%{?dist}%{!?dist:%{courier_release}}
+Release: 2%{?dist}%{!?dist:%{courier_release}}
 License: GPLv3
 Group: Applications/Internet
 Source: maildrop-%{version}.tar.bz2
@@ -20,6 +20,7 @@ BuildRequires: courier-unicode-devel >= 2.1
 BuildRequires: courier-authlib-devel
 Patch0: apnscp-maildrop.patch
 Patch1: maildrop-bypass-authlib.patch
+Patch2: maildrop-recipient.patch
 
 %package devel
 Summary: development tools for handling E-mail messages
@@ -67,6 +68,7 @@ utilities.
 %setup -q
 %patch0 -p1 -b .apnscp
 %patch1 -p1
+%patch2 -p1
 
 %configure --with-devel --enable-userdb --enable-maildirquota --enable-syslog=1 --enable-trusted-users='root mail daemon postmaster qmaild mmdf' --enable-restrict-trusted=0 --enable-sendmail=/usr/sbin/sendmail
 
