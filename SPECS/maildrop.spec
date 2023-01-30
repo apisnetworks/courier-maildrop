@@ -14,7 +14,7 @@ Source: maildrop-%{version}.tar.bz2
 Url: http://www.courier-mta.org/maildrop/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Requires: courier-unicode >= 2.1
-BuildRequires: /usr/include/fam.h gdbm-devel pcre2-devel
+BuildRequires: gdbm-devel pcre2-devel
 BuildRequires: libidn-devel
 BuildRequires: courier-unicode-devel >= 2.1
 BuildRequires: courier-authlib-devel
