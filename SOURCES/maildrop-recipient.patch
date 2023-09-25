@@ -32,4 +32,3 @@ diff -Nur maildrop-3.0.8-orig/libs/maildrop/main.C maildrop-3.0.8/libs/maildrop/
  		++i;
  	}
  
-Binary files maildrop-3.0.8-orig/libs/maildrop/main.o and maildrop-3.0.8/libs/maildrop/main.o differ

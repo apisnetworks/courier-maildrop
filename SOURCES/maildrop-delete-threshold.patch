@@ -1,0 +1,25 @@
+--- maildrop-3.0.8-orig/libs/maildrop/main.C	2023-09-25 14:59:03.259852406 -0400
++++ maildrop-3.0.8/libs/maildrop/main.C	2023-09-25 17:36:11.122291066 -0400
+@@ -264,7 +264,11 @@
+	name="UMASK";
+	value="077";
+	SetVar(name, value);
+-
++	name="DELETE_THRESHOLD";
++	if (!atoi(GetVarStr(name))) {
++		value="25";
++		SetVar(name, value);
++	}
+	if (maildrop.init_quota.Length() > 0)
+	{
+		name="MAILDIRQUOTA";
+@@ -809,7 +813,8 @@
+
+		if (maildrop.isdelivery)
+		{
+-			if (name == "LANG" ||
++			if (name == "DELETE_THRESHOLD" ||
++			    name == "LANG" ||
+			    name == "LANGUAGE" ||
+			    strncmp(name, "LC_", 3) == 0)
+				;
