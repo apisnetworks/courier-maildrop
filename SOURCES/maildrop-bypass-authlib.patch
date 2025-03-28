@@ -10,7 +10,7 @@
 +			break;
  		case 'V':
  			if (!*optarg && argn < argc)	optarg=argv[argn++];
- 			maildrop.verbose_level=atoi(optarg);
+ 			SetVar("VERBOSE", optarg);
 @@ -643,7 +647,7 @@
  			}
  			else
