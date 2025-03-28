@@ -1,87 +1,23 @@
-diff -Nur maildrop-2.9.3-orig/libs/maildrop/lexer.h maildrop-2.9.3/libs/maildrop/lexer.h
---- maildrop-2.9.3-orig/libs/maildrop/lexer.h	2013-08-25 14:54:20.000000000 -0400
-+++ maildrop-2.9.3/libs/maildrop/lexer.h	2018-06-09 17:48:53.788180761 -0400
-@@ -37,9 +37,11 @@
- 
- 	// nextchar() is used to actually read the next character.
- 
--	int	nextchar() { int c=file.get();
-+       int     nextchar() { int c=file.get(), incr=0;
- 
--				if (c == '\n')	++linenum;
-+                               if (c == '\r') { incr=1; c = file.get(); }
-+                               if (c == '\n') { incr=1; }
-+                               if (incr) { ++linenum; } 
- 				return (c);
- 			}
- 	void	error(const char *);
-diff -Nur maildrop-2.9.3-orig/libs/maildrop/main.C maildrop-2.9.3/libs/maildrop/main.C
---- maildrop-2.9.3-orig/libs/maildrop/main.C	2017-08-19 09:30:56.000000000 -0400
-+++ maildrop-2.9.3/libs/maildrop/main.C	2018-06-09 18:07:09.426404364 -0400
-@@ -303,9 +303,13 @@
+--- maildrop-3.0.8/libs/maildrop/main.C	2023-04-06 17:54:51.000000000 -0500
++++ maildrop-3.0.8/libs/maildrop/main.C	2025-03-27 13:06:56.777704369 -0500
+@@ -314,23 +314,28 @@
  	}
  
  	uid_t u;
--	if (auth->sysusername)
-+	if (auth->sysusername || auth->address)
- 	{
--		struct	passwd *q=getpwnam(auth->sysusername);
-+		Buffer val, name;
-+		struct	passwd *q = auth->sysusername ?
-+			getpwnam(auth->sysusername) : getpwnam(auth->address);
-+		name.set("RECIPIENT");
-+		val.set(auth->sysusername ? auth->sysusername : auth->address);
- 
- 		if (q == NULL)
- 		{
-@@ -317,9 +321,12 @@
- 		}
- 
- 		u=q->pw_uid;
-+		SetVar(name, val);
- 	}
--	else
-+	else {
- 		u=*auth->sysuserid;
-+	}
-+
- 
- 	if (VerboseLevel() > 1)
- 	{
-@@ -387,12 +394,12 @@
- 			    void *void_arg)
- {
- 	Maildrop &maildrop=*(Maildrop *)void_arg;
--
--	if (VerboseLevel() > 1)
-+	//auth.sysusername = &auth->address;
-+	if ((VerboseLevel() > 1))
- 	{
- 		Buffer b;
- 
--		b.set(auth->sysgroupid);
-+		b.set(auth->sysusername);
- 		b.push(0);
- 
- 		merr << "maildrop: dovecotauth: groupid="
-@@ -402,24 +409,29 @@
- 	setgroupid(auth->sysgroupid);
- 
- 	uid_t u;
--	if (auth->sysusername)
 +	if (auth->address)
+-	if (auth->sysusername)
  	{
++		std::string val, name;
++		struct	passwd *q = getpwnam(auth->address);
++		name = "RECIPIENT";
++		val = auth->address;
 -		struct	passwd *q=getpwnam(auth->sysusername);
--
-+		Buffer val, name;
-+		struct	passwd *q=getpwnam(auth->address);
-+		name.set("RECIPIENT");
-+		val.set(auth->address);
+ 
  		if (q == NULL)
  		{
  			merr << "Cannot find system user "
--			     << auth->sysusername
 +			     << auth->address
+-			     << auth->sysusername
  			     << "\n";
  
  			nochangeuidgid();
@@ -90,31 +26,28 @@ diff -Nur maildrop-2.9.3-orig/libs/maildrop/main.C maildrop-2.9.3/libs/maildrop/
  		u=q->pw_uid;
 +		SetVar(name, val);
  	}
++	else {
 -	else
-+	else 
-+	{
  		u=*auth->sysuserid;
--
 +	}
-+	
+ 
  	if (VerboseLevel() > 1)
  	{
- 		Buffer b;
-@@ -885,7 +897,7 @@
+@@ -903,7 +908,7 @@
  			{
  				if ( !S_ISDIR(buf.st_mode))
  					tempfail("$HOME/.mailfilters should be a directory.");
--				if ( buf.st_mode & (S_IRWXO|S_IRWXG))
 +				if ( buf.st_mode & (S_IRWXO|S_IWGRP))
+-				if ( buf.st_mode & (S_IRWXO|S_IRWXG))
  					tempfail("Invalid permissions on $HOME/.mailfilters - remove world and group perms.");
  				if ( buf.st_uid != getuid())
  					tempfail("Invalid user ownership of $HOME/.mailfilters.");
-@@ -1080,7 +1092,7 @@
+@@ -1102,7 +1107,7 @@
  
  		if (!S_ISREG(stat_buf.st_mode))
  			tempfail("mailfilter file isn't a regular file.");
--		if (stat_buf.st_mode & (S_IRWXO | S_IRWXG))
 +		if (stat_buf.st_mode & (S_IWGRP | S_IWOTH))
+-		if (stat_buf.st_mode & (S_IRWXO | S_IRWXG))
  			tempfail("Cannot have world/group permissions on the filter file - for your own good.");
  		if (stat_buf.st_uid != getuid())
  			tempfail("mailfilter file is owned by the wrong user.");

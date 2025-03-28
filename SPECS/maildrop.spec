@@ -6,22 +6,25 @@
 
 Summary: Maildrop mail filter/mail delivery agent
 Name: maildrop
-Version: 3.0.8
-Release: 3%{?dist}%{!?dist:%{courier_release}}
+Version: 3.1.8
+Release: 1%{?dist}%{!?dist:%{courier_release}}
 License: GPLv3
+Epoch: 3
 Group: Applications/Internet
 Source: maildrop-%{version}.tar.bz2
 Url: http://www.courier-mta.org/maildrop/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
-Requires: courier-unicode >= 2.1
+Requires: courier-unicode >= 2.3
 BuildRequires: gdbm-devel pcre2-devel
 BuildRequires: libidn-devel
-BuildRequires: courier-unicode-devel >= 2.1
+BuildRequires: courier-unicode-devel >= 2.3
 BuildRequires: courier-authlib-devel
+BuildRequires: dovecot-devel
 Patch0: apnscp-maildrop.patch
 Patch1: maildrop-bypass-authlib.patch
 Patch2: maildrop-recipient.patch
 Patch3: maildrop-delete-threshold.patch
+Patch4: maildrop-dovecot-chroot.patch
 
 %package devel
 Summary: development tools for handling E-mail messages
@@ -71,8 +74,9 @@ utilities.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 
-%configure --with-devel --enable-userdb --enable-maildirquota --enable-syslog=1 --enable-trusted-users='root mail daemon postmaster qmaild mmdf' --enable-restrict-trusted=0 --enable-sendmail=/usr/sbin/sendmail
+%configure --with-devel --enable-dovecotauth --enable-userdb --enable-maildirquota --enable-syslog=1 --enable-trusted-users='root mail daemon postmaster qmaild mmdf' --enable-restrict-trusted=0 --enable-sendmail=/usr/sbin/sendmail
 
 %build
 

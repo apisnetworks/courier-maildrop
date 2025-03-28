@@ -1,0 +1,51 @@
+diff -Nur maildrop-3.1.8/libs/maildrop/dovecotauth.c maildrop-3.1.8-new/libs/maildrop/dovecotauth.c
+--- maildrop-3.1.8/libs/maildrop/dovecotauth.c	2018-04-27 20:43:41.000000000 -0500
++++ maildrop-3.1.8-new/libs/maildrop/dovecotauth.c	2025-03-27 14:55:03.908139506 -0500
+@@ -337,6 +337,9 @@
+ 		else if (strncmp(p, "mail=", 5) == 0)
+ 		{
+ 			a.maildir=p+5;
++		} else if (strncmp(p, "chroot=", 7) == 0)
++		{
++			a.chroot=p+7;
+ 		}
+ 	}
+ 
+diff -Nur maildrop-3.1.8/libs/maildrop/dovecotauth.h maildrop-3.1.8-new/libs/maildrop/dovecotauth.h
+--- maildrop-3.1.8/libs/maildrop/dovecotauth.h	2014-10-28 19:27:08.000000000 -0500
++++ maildrop-3.1.8-new/libs/maildrop/dovecotauth.h	2025-03-27 14:55:03.827302161 -0500
+@@ -26,6 +26,7 @@
+ 	gid_t sysgroupid;
+ 	const char *homedir;
+ 	const char *maildir;
++	const char *chroot;
+ 	} ;
+ 
+ /*
+diff -Nur maildrop-3.1.8/libs/maildrop/main.C maildrop-3.1.8-new/libs/maildrop/main.C
+--- maildrop-3.1.8/libs/maildrop/main.C	2025-03-28 12:12:43.618086286 -0500
++++ maildrop-3.1.8-new/libs/maildrop/main.C	2025-03-28 12:20:14.171639694 -0500
+@@ -422,6 +422,23 @@
+ 		     << b << "\n";
+ 	}
+ 
++	if (auth->chroot)
++	{
++		if (VerboseLevel() > 1)
++		{
++			merr << "maildrop: chroot in process: "
++				 << auth->chroot
++				 << "\n";
++		}
++
++		if (chroot(auth->chroot)) {
++			errexit = EX_TEMPFAIL;
++			throw "Unable to chroot to requested path";
++		}
++
++		chdir(".");
++	}
++
+ 	setgroupid(auth->sysgroupid);
+ 
+ 	uid_t u;
