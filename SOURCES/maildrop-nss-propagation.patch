@@ -1,0 +1,10 @@
+--- maildrop-3.1.8-new/libs/maildrop/main.C	2025-03-28 12:20:14.171639694 -0500
++++ maildrop-3.1.8/libs/maildrop/main.C	2025-04-08 15:23:09.090269423 -0500
+@@ -324,6 +324,7 @@
+ 	if (auth->address)
+ 	{
+ 		std::string val, name;
++		putenv("_NSS_AUTOJAIL=1");
+ 		struct	passwd *q = getpwnam(auth->address);
+ 		name = "RECIPIENT";
+ 		val = auth->address;

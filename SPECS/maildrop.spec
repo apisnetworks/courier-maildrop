@@ -25,6 +25,7 @@ Patch1: maildrop-bypass-authlib.patch
 Patch2: maildrop-recipient.patch
 Patch3: maildrop-delete-threshold.patch
 Patch4: maildrop-dovecot-chroot.patch
+Patch5: maildrop-nss-propagation.patch
 
 %package devel
 Summary: development tools for handling E-mail messages
@@ -75,6 +76,7 @@ utilities.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+%patch5 -p1
 
 %configure --with-devel --enable-dovecotauth --enable-userdb --enable-maildirquota --enable-syslog=1 --enable-trusted-users='root mail daemon postmaster qmaild mmdf' --enable-restrict-trusted=0 --enable-sendmail=/usr/sbin/sendmail --with-default-maildrop=./Mail
 
